@@ -119,6 +119,16 @@
   .step-nav{max-width:560px;margin:18px auto 0;display:flex;justify-content:space-between;gap:12px}
   .step-nav .btn{flex:0 0 auto}
   .step-nav .sp{flex:1}
+  .hero-btn{border:none;background:var(--blue);color:#fff;font-family:var(--font);font-weight:500;font-size:18px;padding:16px 34px;border-radius:100px;cursor:pointer;box-shadow:0 8px 24px -8px var(--blue);transition:.18s}
+  .hero-btn:hover{background:var(--blue-h);transform:translateY(-1px)}
+  .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+  .modal-ov.open{display:flex;animation:fade .2s}
+  .modal-box{background:var(--bg);border-radius:22px;max-width:640px;width:100%;box-shadow:0 40px 90px rgba(0,0,0,.4);animation:pop .3s cubic-bezier(.2,1.1,.35,1);overflow:hidden;margin:auto 0}
+  @keyframes pop{from{transform:translateY(14px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+  .modal-top{display:flex;align-items:center;gap:14px;padding:18px 22px;border-bottom:1px solid var(--line2);position:sticky;top:0;background:var(--bg);z-index:2}
+  .modal-top .steps-bar{flex:1;margin:0;max-width:none}
+  .modal-x{border:none;background:var(--bg2);width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--text);font-size:15px;flex:none}
+  .modal-body{padding:24px 22px 26px}
   footer{border-top:1px solid var(--line2);padding:24px 0 40px;text-align:center;color:var(--text2);font-size:12.5px}
 </style>
 </head>
@@ -128,17 +138,17 @@
 <section class="hero wrap" id="hero">
   <h1>Viena eilutė.<br>Visa sąskaita.</h1>
   <p class="sub">Įrašyk kliento PVM kodą — rekvizitai užsipildo iš oficialaus registro.</p>
-  <div class="magic">
-    <input id="q" placeholder="Kliento PVM kodas (pvz. LT100001738313)" autocomplete="off">
-    <button id="go">Sukurti</button>
-  </div>
-  <p class="hint">Duomenys iš ES VIES registro. Ne PVM mokėtojui — įrašysi ranka.</p>
-  <p class="fine"><b>Nemokama.</b> Be registracijos.</p>
+  <button id="go" class="hero-btn">Sukurti sąskaitą</button>
+  <p class="fine"><b>Nemokama.</b> Be registracijos · PDF per 40 sekundžių.</p>
 </section>
 
-<section id="work"><div class="wrap">
-  <button class="back" id="back">← Pradžia</button>
-  <div class="steps-bar"><div class="st on" data-s="1"></div><div class="st" data-s="2"></div><div class="st" data-s="3"></div></div>
+<div class="modal-ov" id="work">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div class="steps-bar"><div class="st on" data-s="1"></div><div class="st" data-s="2"></div><div class="st" data-s="3"></div></div>
+      <button class="modal-x" id="back">✕</button>
+    </div>
+    <div class="modal-body">
 
   <!-- ŽINGSNIS 1: TU -->
   <div class="step on" id="step1">
@@ -182,6 +192,9 @@ Vilnius, Lietuva</textarea></div>
     <div class="step-card">
       <div class="card">
         <h3>Klientas</h3>
+        <div class="fld"><label>Kliento PVM kodas (užpildys automatiškai)</label>
+          <div style="display:flex;gap:8px"><input id="bVat" placeholder="pvz. LT100001738313" style="flex:1"><button class="btn btn-p" id="viesBtn" style="padding:10px 16px;font-size:14px">Ieškoti</button></div>
+        </div>
         <div class="fld"><label>Pavadinimas</label><input id="bName" placeholder="Kliento pavadinimas"></div>
         <div class="fld"><label>Rekvizitai</label><textarea id="bDet" placeholder="PVM kodas, adresas"></textarea></div>
         <div class="note" id="note"></div>
@@ -226,9 +239,12 @@ Vilnius, Lietuva</textarea></div>
       <div id="saveMsg" class="savemsg"></div>
       <div class="recent"><div class="recent-h">Paskutinės sąskaitos</div><div id="recentList" class="recent-list">Kraunama…</div></div>
     </div>
-    <div class="step-nav"><button class="btn btn-g" data-prev="2">← Atgal</button><span class="sp"></span></div>
+    <div class="step-nav"><button class="btn btn-g" data-prev="2">← Atgal</button><span class="sp"></span><button class="btn btn-p" id="newInv">Nauja sąskaita</button></div>
   </div>
-</div></section>
+
+    </div>
+  </div>
+</div>
 
 <footer>Pavara · autofill iš ES VIES · duomenys saugomi</footer>
 
@@ -321,22 +337,26 @@ Vilnius, Lietuva</textarea></div>
   function syncBuyer(){pTo.textContent=bName.value||'—';pToDet.textContent=bDet.value||'';}
   bName.addEventListener('input',syncBuyer);bDet.addEventListener('input',syncBuyer);
 
-  async function start(){
-    var v=(q.value||'').trim();if(!v){q.focus();return;}
-    hero.style.display='none';work.classList.add('on');window.scrollTo(0,0);
-    drawEditor();draw();goStep(1);
-    note.textContent='';bName.value='';bDet.value='';syncBuyer();buyer.classList.add('filling');
+  function openModal(){ work.classList.add('open'); document.body.style.overflow='hidden'; drawEditor(); draw(); goStep(1); }
+  function closeModal(){ work.classList.remove('open'); document.body.style.overflow=''; }
+  document.getElementById('go').addEventListener('click',openModal);
+  document.getElementById('back').addEventListener('click',closeModal);
+  work.addEventListener('click',function(e){ if(e.target===work) closeModal(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+  var newInv=document.getElementById('newInv'); if(newInv) newInv.addEventListener('click',function(){ goStep(1); document.querySelector('.modal-box').scrollTop=0; });
+
+  // VIES autofill iš kliento žingsnio (mygtukas prie kliento PVM lauko)
+  async function viesFill(){
+    var v=(document.getElementById('bVat').value||'').trim(); if(!v) return;
+    note.textContent=''; buyer.classList.add('filling');
     try{
-      var r=await fetch('/api/lookup?vat='+encodeURIComponent(v));var d=await r.json();
+      var r=await fetch('/api/lookup?vat='+encodeURIComponent(v)); var d=await r.json();
       buyer.classList.remove('filling');
-      if(d.ok){bName.value=d.name||'';bDet.value=(d.vat?'PVM '+d.vat:'')+(d.address?'\n'+d.address:'');}
-      else{bName.value=/^[A-Za-z„]/.test(v)?v:'';note.textContent=d.error==='invalid'?'VIES nerado šio PVM kodo — įrašyk ranka.':d.error==='not_vat'?'Tai ne PVM kodas — įrašyk rekvizitus ranka.':'Nepavyko pasiekti VIES — įrašyk ranka.';}
+      if(d.ok){ bName.value=d.name||''; bDet.value=(d.vat?'PVM '+d.vat:'')+(d.address?'\n'+d.address:''); }
+      else{ note.textContent=d.error==='invalid'?'VIES nerado šio PVM kodo — įrašyk ranka.':d.error==='not_vat'?'Tai ne PVM kodas — įrašyk ranka.':'Nepavyko pasiekti VIES — įrašyk ranka.'; }
       syncBuyer();
-    }catch(e){buyer.classList.remove('filling');note.textContent='Tinklo klaida — įrašyk ranka.';syncBuyer();}
+    }catch(e){ buyer.classList.remove('filling'); note.textContent='Tinklo klaida — įrašyk ranka.'; }
   }
-  document.getElementById('go').addEventListener('click',start);
-  q.addEventListener('keydown',function(e){if(e.key==='Enter')start();});
-  document.getElementById('back').addEventListener('click',function(){work.classList.remove('on');hero.style.display='';q.value='';goStep(1);window.scrollTo(0,0);});
 
   // totals helper for save/pdf
   function totals(){var sub=0,tv=0;lines.forEach(function(l){var a=(+l.q||0)*(+l.p||0);sub+=a;if(vatOn&&l.vat!=='AK')tv+=a*(+l.vat||0)/100;});return{sub:sub,vat:tv,total:sub+tv};}
@@ -389,6 +409,8 @@ Vilnius, Lietuva</textarea></div>
   document.querySelectorAll('[data-next]').forEach(function(b){b.addEventListener('click',function(){goStep(+b.dataset.next);});});
   document.querySelectorAll('[data-prev]').forEach(function(b){b.addEventListener('click',function(){goStep(+b.dataset.prev);});});
 
+  var vb=document.getElementById('viesBtn'); if(vb) vb.addEventListener('click',viesFill);
+  var bv=document.getElementById('bVat'); if(bv) bv.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();viesFill();}});
   drawEditor();draw();syncBuyer();loadRecent();
 })();
 </script>
