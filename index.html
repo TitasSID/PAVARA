@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pavara — viena eilutė, visa sąskaita</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fff;--bg2:#f5f5f7;--text:#1d1d1f;--text2:#6e6e73;--line:#d2d2d7;--line2:#e8e8ed;--sheet:#fff;--blue:#0071e3;--blue-h:#0077ed;--green:#34c759;--radius:18px;--shadow:0 6px 30px rgba(0,0,0,.08);--font:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,sans-serif}
+  @media (prefers-color-scheme:dark){:root{--bg:#000;--bg2:#101013;--text:#f5f5f7;--text2:#86868b;--line:#3a3a3d;--line2:#2a2a2c;--sheet:#1c1c1e;--blue:#2997ff;--blue-h:#3aa0ff;--green:#30d158;--shadow:0 6px 30px rgba(0,0,0,.55)}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:17px;line-height:1.47;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:960px;margin:0 auto;padding:0 22px}
+  nav{border-bottom:1px solid var(--line2)}
+  .nav-in{max-width:960px;margin:0 auto;padding:16px 22px;display:flex;align-items:center;gap:9px;font-weight:600;font-size:19px}
+  .hero{text-align:center;padding:80px 0 60px}
+  h1{font-weight:600;font-size:clamp(34px,7vw,56px);line-height:1.05;letter-spacing:-.03em;margin-bottom:16px}
+  .sub{font-size:clamp(17px,2.3vw,21px);color:var(--text2);max-width:32ch;margin:0 auto 34px}
+  .hero-btn{border:none;background:var(--blue);color:#fff;font-family:var(--font);font-weight:500;font-size:18px;padding:16px 34px;border-radius:100px;cursor:pointer;box-shadow:0 8px 24px -8px var(--blue)}
+  .hero-btn:hover{background:var(--blue-h)}
+  .fine{margin-top:18px;font-size:13px;color:var(--text2)} .fine b{color:var(--green);font-weight:500}
+
+  .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:60;display:none;align-items:flex-start;justify-content:center;padding:28px 16px;overflow-y:auto}
+  .modal-ov.open{display:flex}
+  .modal-box{background:var(--bg);border-radius:22px;max-width:640px;width:100%;box-shadow:0 40px 90px rgba(0,0,0,.4);overflow:hidden;margin:auto 0}
+  .modal-top{display:flex;align-items:center;gap:14px;padding:16px 20px;border-bottom:1px solid var(--line2);position:sticky;top:0;background:var(--bg);z-index:2}
+  .steps-bar{display:flex;gap:8px;flex:1}
+  .steps-bar .st{flex:1;height:4px;border-radius:3px;background:var(--line2)}
+  .steps-bar .st.on{background:var(--blue)}
+  .modal-x{border:none;background:var(--bg2);width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--text);font-size:15px;flex:none}
+  .modal-body{padding:22px 20px 24px}
+  .step{display:none} .step.on{display:block}
+  .step-h{text-align:center;margin-bottom:18px}
+  .step-h .k{font-size:12px;color:var(--blue);font-weight:600;margin-bottom:5px}
+  .step-h h2{font-size:24px;font-weight:600;letter-spacing:-.02em}
+
+  .card{background:var(--sheet);border:1px solid var(--line2);border-radius:14px;padding:18px;margin-bottom:14px}
+  .card h3{font-size:14px;font-weight:600;margin-bottom:12px}
+  .fld{margin-bottom:12px} .fld:last-child{margin-bottom:0}
+  .fld label{display:block;font-size:12px;color:var(--text2);margin-bottom:5px;font-weight:500}
+  .fld input,.fld textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text);font-family:var(--font);font-size:14px;outline:none}
+  .fld textarea{resize:vertical;min-height:54px;line-height:1.5}
+  .fld input:focus,.fld textarea:focus{border-color:var(--blue);background:var(--sheet)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  @media (max-width:520px){.row3{grid-template-columns:1fr 1fr}}
+  .flex{display:flex;gap:8px}
+
+  .lcard{border:1px solid var(--line2);border-radius:11px;padding:10px;margin-bottom:8px;background:var(--bg2)}
+  .lc-top{display:grid;grid-template-columns:84px 1fr;gap:6px;margin-bottom:7px}
+  .lc-top input{border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--text);font-family:var(--font);font-size:13px;padding:8px;outline:none;width:100%}
+  .lc-meta{display:grid;grid-template-columns:50px 60px 1fr 54px 24px;gap:6px;align-items:center}
+  .lc-meta input,.lc-meta select{border:1px solid var(--line);border-radius:8px;background:var(--sheet);color:var(--text);font-family:var(--font);font-size:13px;padding:8px 5px;outline:none;width:100%}
+  .rm{border:none;background:none;color:var(--text2);font-size:17px;cursor:pointer}
+  .addl{width:100%;margin-top:4px;border:1px dashed var(--line);background:none;color:var(--text2);font-family:var(--font);font-size:14px;padding:10px;border-radius:10px;cursor:pointer}
+  .vatsw{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:11px 13px;background:var(--bg2);border-radius:11px}
+  .vatsw .l{font-size:13px;font-weight:500} .vatsw .s{font-size:11.5px;color:var(--text2)}
+  .sw{width:44px;height:26px;border-radius:20px;background:var(--line);position:relative;cursor:pointer;flex:none}
+  .sw::after{content:"";position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s}
+  .sw.on{background:var(--green)} .sw.on::after{transform:translateX(18px)}
+
+  .sheet{background:var(--sheet);border:1px solid var(--line2);border-radius:14px;padding:24px}
+  .s-top{display:flex;justify-content:space-between;gap:14px;margin-bottom:20px}
+  .s-top .ttl{font-size:20px;font-weight:600} .s-top .no{font-size:12px;color:var(--text2);margin-top:3px}
+  .s-top .dt{font-size:11px;color:var(--text2);text-align:right;line-height:1.8} .s-top .dt b{color:var(--text)}
+  .parties{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+  @media (max-width:480px){.parties{grid-template-columns:1fr}}
+  .pty .r{font-size:11px;color:var(--text2);margin-bottom:4px} .pty .nm{font-size:14px;font-weight:600}
+  .pty .ln{font-size:12px;color:var(--text2);line-height:1.5;white-space:pre-line}
+  table{width:100%;border-collapse:collapse} th{text-align:left;font-size:11px;color:var(--text2);font-weight:500;padding:0 0 7px;border-bottom:1px solid var(--line)}
+  th.n,td.n{text-align:right} td{padding:9px 0;border-bottom:1px solid var(--line2);font-size:13px}
+  .tot{margin-left:auto;width:min(240px,100%);margin-top:12px}
+  .tot .r{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;color:var(--text2)} .tot .r .v{color:var(--text)}
+  .tot .g{display:flex;justify-content:space-between;margin-top:6px;padding-top:10px;border-top:1px solid var(--text);font-weight:600}
+  .tot .g .v{font-size:20px}
+  .s-note{margin-top:12px;font-size:11px;color:var(--text2);line-height:1.5}
+  .pay{margin-top:14px;padding:11px 13px;background:var(--bg2);border-radius:10px;font-size:12px;color:var(--text2);display:none} .pay b{color:var(--text)}
+  .note{font-size:12px;color:#c67a1e;margin-top:4px;white-space:pre-line}
+
+  .step-nav{display:flex;justify-content:space-between;gap:12px;margin-top:16px} .step-nav .sp{flex:1}
+  .btn{font-family:var(--font);font-size:15px;font-weight:500;border-radius:100px;padding:12px 22px;cursor:pointer;border:1px solid transparent}
+  .btn-p{background:var(--blue);color:#fff} .btn-p:hover{background:var(--blue-h)}
+  .btn-g{background:transparent;color:var(--blue);border-color:var(--line)}
+  .savemsg{margin-top:10px;font-size:13px;color:var(--green)} .savemsg.err{color:#c6462e}
+  .recent{margin-top:24px} .recent-h{font-size:13px;color:var(--text2);font-weight:500;margin-bottom:10px}
+  .rec{display:flex;justify-content:space-between;gap:12px;background:var(--sheet);border:1px solid var(--line2);border-radius:11px;padding:11px 14px;margin-bottom:7px}
+  .rec .who{font-size:14px;font-weight:500} .rec .meta{font-size:12px;color:var(--text2)} .rec .amt{font-size:14px;font-weight:600}
+  .rec-empty{font-size:13px;color:var(--text2)}
+  .acct{margin-top:16px;padding:16px;border:1px solid var(--blue);border-radius:14px;background:color-mix(in srgb,var(--blue) 5%,var(--sheet));display:none}
+  .acct.on{display:block;animation:fade .3s} @keyframes fade{from{opacity:0}to{opacity:1}}
+  .acct-h{font-size:15px;font-weight:600;margin-bottom:4px}
+  .acct-s{font-size:13px;color:var(--text2);margin-bottom:12px;line-height:1.5}
+  .acct input{padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg2);color:var(--text);font-family:var(--font);font-size:14px;outline:none}
+  .acct input:focus{border-color:var(--blue);background:var(--sheet)}
+  .results{position:absolute;left:0;right:0;top:100%;background:var(--sheet);border:1px solid var(--line);border-radius:0 0 10px 10px;box-shadow:var(--shadow);z-index:5;display:none;max-height:300px;overflow-y:auto;margin-top:2px}
+  .results.on{display:block}
+  .res-item{padding:10px 12px;cursor:pointer;border-top:1px solid var(--line2)}
+  .res-item:first-child{border-top:none} .res-item:hover{background:var(--bg2)}
+  .res-item .rn{font-size:13px;font-weight:500} .res-item .rm2{font-size:11.5px;color:var(--text2);margin-top:2px}
+  .res-empty{padding:10px 12px;font-size:12.5px;color:var(--text2)}
+  .lc-labels{display:grid;grid-template-columns:50px 60px 1fr 54px 24px;gap:6px;padding:0 0 4px;margin-top:2px}
+  .lc-labels span{font-size:10.5px;color:var(--text2);font-weight:500}
+  .lc-labels span.r{text-align:left}
+  footer{border-top:1px solid var(--line2);padding:24px 0 40px;text-align:center;color:var(--text2);font-size:12.5px}
+</style>
+</head>
+<body>
+<nav><div class="nav-in">Pavara</div></nav>
+
+<section class="hero wrap">
+  <h1>Viena eilutė.<br>Visa sąskaita.</h1>
+  <p class="sub">Susivedi rekvizitus, gauni tvarkingą sąskaitą, atsisiunti PDF.</p>
+  <button id="go" class="hero-btn">Sukurti sąskaitą</button>
+  <p class="fine"><b>Nemokama.</b> Be registracijos · PDF per 40 sekundžių.</p>
+</section>
+
+<div class="modal-ov" id="modal">
+  <div class="modal-box">
+    <div class="modal-top">
+      <div class="steps-bar"><div class="st on" data-s="1"></div><div class="st" data-s="2"></div><div class="st" data-s="3"></div></div>
+      <button class="modal-x" id="close">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="step on" id="step1">
+        <div class="step-h"><div class="k">1 / 3</div><h2>Tavo rekvizitai ir paslaugos</h2></div>
+        <div class="card">
+          <h3>Pardavėjas (tu)</h3>
+          <div class="fld"><label>Pavadinimas</label><input id="fromName" value="MB „Kūrybos studija“"></div>
+          <div class="fld"><label>Rekvizitai</label><textarea id="fromDet">Įm. k. 304991230
+PVM LT100009000112
+Vilnius, Lietuva</textarea></div>
+          <div class="row2"><div class="fld"><label>IBAN</label><input id="iban" value="LT12 3456 7890 1234 5678"></div><div class="fld"><label>Bankas</label><input id="bank" value="AB „Swedbank“"></div></div>
+        </div>
+        <div class="card">
+          <h3>Dokumentas</h3>
+          <div class="fld"><label>Pavadinimas</label><input id="docTitle" value="PVM sąskaita faktūra"></div>
+          <div class="row2"><div class="fld"><label>Serija</label><input id="docSeries" value="SF"></div><div class="fld"><label>Numeris</label><input id="docNo" value="2026-001"></div></div>
+          <div class="row3"><div class="fld"><label>Išrašyta</label><input id="docDate" type="date"></div><div class="fld"><label>Operacijos</label><input id="docOp" type="date"></div><div class="fld"><label>Apmokėti iki</label><input id="docDue" type="date"></div></div>
+        </div>
+        <div class="card">
+          <h3>Eilutės</h3>
+          <div class="lc-labels"><span>Kiekis</span><span>Vnt</span><span>Kaina €</span><span>PVM</span><span></span></div>
+          <div id="ed"></div>
+          <button class="addl" id="add">+ Pridėti eilutę</button>
+          <div class="vatsw"><div><div class="l">PVM mokėtojas</div><div class="s">Išjungus — be PVM</div></div><div class="sw on" id="vatSw"></div></div>
+        </div>
+        <div class="step-nav"><span class="sp"></span><button class="btn btn-p" data-next="2">Toliau →</button></div>
+      </div>
+
+      <div class="step" id="step2">
+        <div class="step-h"><div class="k">2 / 3</div><h2>Kliento rekvizitai</h2></div>
+        <div class="card">
+          <h3>Klientas</h3>
+          <div class="fld" style="position:relative">
+            <label>Ieškok pagal pavadinimą arba įmonės kodą</label>
+            <input id="cSearch" placeholder="pvz. Telia arba 121215434" autocomplete="off">
+            <div id="cResults" class="results"></div>
+            <div style="font-size:11.5px;color:var(--text2);margin-top:6px">Nerandi? Įrašyk rekvizitus ranka laukuose žemiau.</div>
+          </div>
+          <div class="fld"><label>Pavadinimas</label><input id="bName" placeholder="Kliento pavadinimas"></div>
+          <div class="fld"><label>Rekvizitai</label><textarea id="bDet" placeholder="Kodas, PVM, adresas"></textarea></div>
+          <div class="note" id="note"></div>
+        </div>
+        <div class="step-nav"><button class="btn btn-g" data-prev="1">← Atgal</button><span class="sp"></span><button class="btn btn-p" data-next="3">Peržiūrėti →</button></div>
+      </div>
+
+      <div class="step" id="step3">
+        <div class="step-h"><div class="k">3 / 3</div><h2>Tavo sąskaita</h2></div>
+        <div class="sheet">
+          <div class="s-top"><div><div class="ttl" id="sTitle">—</div><div class="no" id="sNo">—</div></div><div class="dt">Išrašyta: <b id="sDate">—</b><br>Operacijos: <b id="sOp">—</b><br>Apmokėti iki: <b id="sDue">—</b></div></div>
+          <div class="parties"><div class="pty"><div class="r">Pardavėjas</div><div class="nm" id="pFrom">—</div><div class="ln" id="pFromDet"></div></div><div class="pty"><div class="r">Pirkėjas</div><div class="nm" id="pTo">—</div><div class="ln" id="pToDet"></div></div></div>
+          <table><thead><tr><th>Paslauga</th><th class="n">Kiekis</th><th class="n">Kaina</th><th class="n">PVM</th><th class="n">Suma</th></tr></thead><tbody id="rows"></tbody></table>
+          <div class="tot"><div class="r"><span>Suma be PVM</span><span class="v" id="tSub">—</span></div><div id="vatRows"></div><div class="g"><span>Iš viso</span><span class="v" id="tGrand">—</span></div></div>
+          <div class="s-note" id="sNotes"></div>
+          <div class="pay" id="payBlock"></div>
+        </div>
+        <div class="step-nav"><button class="btn btn-g" data-prev="2">← Atgal</button><span class="sp"></span><button class="btn btn-p" id="dl">Atsisiųsti PDF</button></div>
+        <div class="flex" style="margin-top:10px"><button class="btn btn-g" id="save" style="flex:1">Išsaugoti</button></div>
+        <div id="saveMsg" class="savemsg"></div>
+        <div class="acct" id="acct">
+          <div class="acct-h">Sekk visas sąskaitas vienoje vietoje</div>
+          <div class="acct-s">Susikurk paskyrą — matysi visų sąskaitų istoriją, apmokėjimų sekimą ir priminimus vėluojantiems.</div>
+          <div class="flex"><input id="acctEmail" type="email" placeholder="Tavo el. paštas" style="flex:1"><button class="btn btn-p" id="acctBtn">Susikurti</button></div>
+          <div id="acctMsg" class="savemsg"></div>
+        </div>
+        <div class="recent" id="recent" style="display:none"><div class="recent-h">Paskutinės sąskaitos</div><div id="recentList"></div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>Pavara · autofill iš ES VIES · duomenys saugomi</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var $=function(id){return document.getElementById(id);};
+  var fmt=new Intl.NumberFormat('lt-LT',{style:'currency',currency:'EUR'});
+  var pf=new Intl.NumberFormat('lt-LT',{minimumFractionDigits:0,maximumFractionDigits:2});
+  function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+  function iso(d){return d.toISOString().slice(0,10);}
+  var UNITS=['vnt','val','m²','km','kg','mėn.','para','proj.','kompl.','proc.'];
+  var VATS=[['21','21%'],['9','9%'],['5','5%'],['0','0%'],['AK','Atv.']];
+
+  var t=new Date(); $('docDate').value=iso(t); $('docOp').value=iso(t); $('docDue').value=iso(new Date(Date.now()+14*864e5));
+
+  var lines=[{art:'',d:'Paslauga',q:1,u:'vnt',p:100,vat:'21'}];
+  var vatOn=true;
+  var ed=$('ed'), rows=$('rows');
+
+  function uOpts(s){var o='';UNITS.forEach(function(u){o+='<option'+(u===s?' selected':'')+'>'+u+'</option>';});return o;}
+  function vOpts(s){var o='';VATS.forEach(function(p){o+='<option value="'+p[0]+'"'+(p[0]===String(s)?' selected':'')+'>'+p[1]+'</option>';});return o;}
+  function drawEd(){
+    ed.innerHTML='';
+    lines.forEach(function(l,i){
+      var c=document.createElement('div');c.className='lcard';
+      c.innerHTML='<div class="lc-top"><input data-i="'+i+'" data-f="art" value="'+esc(l.art)+'" placeholder="Art."><input data-i="'+i+'" data-f="d" value="'+esc(l.d)+'" placeholder="Paslauga"></div>'+
+        '<div class="lc-meta"><input data-i="'+i+'" data-f="q" type="number" step="any" value="'+l.q+'" title="Kiekis" aria-label="Kiekis"><select data-i="'+i+'" data-f="u" title="Matavimo vienetas">'+uOpts(l.u)+'</select><input data-i="'+i+'" data-f="p" type="number" step="any" value="'+l.p+'" title="Kaina be PVM" aria-label="Kaina"><select data-i="'+i+'" data-f="vat" title="PVM tarifas">'+vOpts(l.vat)+'</select><button class="rm" data-rm="'+i+'" title="Šalinti">×</button></div>';
+      ed.appendChild(c);
+    });
+  }
+  function draw(){
+    rows.innerHTML='';var sub=0,groups={};
+    lines.forEach(function(l){
+      var amt=(+l.q||0)*(+l.p||0);sub+=amt;
+      var rate=vatOn?(l.vat||'21'):null;
+      var rl=!vatOn?'—':(rate==='AK'?'Atv.':rate+'%');
+      if(vatOn){var k=String(rate);if(!groups[k])groups[k]={rate:rate,base:0,vat:0};groups[k].base+=amt;if(rate!=='AK')groups[k].vat+=amt*(+rate||0)/100;}
+      var tr=document.createElement('tr');
+      tr.innerHTML='<td>'+esc(l.d||'—')+'</td><td class="n">'+pf.format(+l.q||0)+' '+esc(l.u||'')+'</td><td class="n">'+fmt.format(+l.p||0)+'</td><td class="n">'+rl+'</td><td class="n">'+fmt.format(amt)+'</td>';
+      rows.appendChild(tr);
+    });
+    var vr=$('vatRows');vr.innerHTML='';var tv=0,ak=false,z=false;
+    if(vatOn){Object.keys(groups).sort(function(a,b){if(a==='AK')return 1;if(b==='AK')return -1;return +b-+a;}).forEach(function(k){
+      var g=groups[k],r=document.createElement('div');r.className='r';
+      if(g.rate==='AK'){ak=true;r.innerHTML='<span>Atvirkštinis apm.</span><span class="v">'+fmt.format(0)+'</span>';}
+      else{tv+=g.vat;if(+g.rate===0)z=true;r.innerHTML='<span>PVM '+g.rate+'%</span><span class="v">'+fmt.format(g.vat)+'</span>';}
+      vr.appendChild(r);});}
+    $('tSub').textContent=fmt.format(sub);
+    $('tGrand').textContent=fmt.format(sub+tv);
+    var n=[];if(ak)n.push('Atvirkštinis apmokestinimas — PVM sumoka pirkėjas (PVMĮ 96 str.).');if(z)n.push('0% PVM tarifas pagal PVMĮ.');if(!vatOn)n.push('Pardavėjas nėra PVM mokėtojas.');
+    $('sNotes').innerHTML=n.map(esc).join('<br>');
+    var ib=$('iban').value.trim(),bk=$('bank').value.trim(),pay=$('payBlock');
+    if(ib||bk){pay.style.display='block';pay.innerHTML='Apmokėti į: <b>'+esc(ib)+'</b>'+(bk?' · '+esc(bk):'');}else{pay.style.display='none';}
+    $('pFrom').textContent=$('fromName').value||'—';
+    $('pFromDet').textContent=$('fromDet').value||'';
+    $('pTo').textContent=$('bName').value||'—';
+    $('pToDet').textContent=$('bDet').value||'';
+    var ser=$('docSeries').value.trim(),no=$('docNo').value.trim();
+    $('sTitle').textContent=$('docTitle').value||'Sąskaita';
+    $('sNo').textContent=(ser?'Serija '+ser+' ':'')+(no?'Nr. '+no:'');
+    $('sDate').textContent=$('docDate').value||'—';$('sOp').textContent=$('docOp').value||'—';$('sDue').textContent=$('docDue').value||'—';
+  }
+  ed.addEventListener('input',function(e){var x=e.target;if(x.dataset.i===undefined)return;lines[+x.dataset.i][x.dataset.f]=x.value;draw();});
+  ed.addEventListener('change',function(e){var x=e.target;if(x.dataset.f==='u'||x.dataset.f==='vat'){lines[+x.dataset.i][x.dataset.f]=x.value;draw();}});
+  ed.addEventListener('click',function(e){if(e.target.dataset.rm!==undefined){lines.splice(+e.target.dataset.rm,1);if(!lines.length)lines.push({art:'',d:'',q:1,u:'vnt',p:0,vat:'21'});drawEd();draw();}});
+  $('add').addEventListener('click',function(){lines.push({art:'',d:'Nauja eilutė',q:1,u:'vnt',p:0,vat:'21'});drawEd();draw();});
+  ['fromName','fromDet','iban','bank','docTitle','docSeries','docNo','docDate','docOp','docDue','bName','bDet'].forEach(function(id){$(id).addEventListener('input',draw);});
+
+  var titleTouched=false;$('docTitle').addEventListener('input',function(){titleTouched=true;});
+  var sw=$('vatSw');sw.addEventListener('click',function(){vatOn=!vatOn;sw.classList.toggle('on',vatOn);if(!titleTouched){$('docTitle').value=vatOn?'PVM sąskaita faktūra':'Sąskaita faktūra';}draw();});
+
+  // steps
+  function goStep(n){[1,2,3].forEach(function(i){$('step'+i).classList.toggle('on',i===n);});document.querySelectorAll('.steps-bar .st').forEach(function(e){e.classList.toggle('on',+e.dataset.s<=n);});var mb=document.querySelector('.modal-box');if(mb)mb.scrollTop=0;}
+  document.querySelectorAll('[data-next]').forEach(function(b){b.addEventListener('click',function(){goStep(+b.dataset.next);});});
+  document.querySelectorAll('[data-prev]').forEach(function(b){b.addEventListener('click',function(){goStep(+b.dataset.prev);});});
+
+  // modal
+  var modal=$('modal');
+  $('go').addEventListener('click',function(){modal.classList.add('open');document.body.style.overflow='hidden';drawEd();draw();goStep(1);});
+  function close(){modal.classList.remove('open');document.body.style.overflow='';}
+  $('close').addEventListener('click',close);
+  modal.addEventListener('click',function(e){if(e.target===modal)close();});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close();});
+
+  // Kliento paieška iš registro (companies) + VIES PVM fone
+  var note=$('note'), cSearch=$('cSearch'), cResults=$('cResults');
+  var selected=null, searchTimer=null;
+  function renderBuyer(){
+    if(!selected)return;
+    $('bName').value=selected.name||'';
+    var d='Įm. k. '+selected.kodas;
+    if(selected.pvm)d+='\nPVM '+selected.pvm;
+    if(selected.adr)d+='\n'+selected.adr;
+    $('bDet').value=d; draw();
+  }
+  async function viesAppend(kodas){
+    try{var r=await fetch('/api/lookup?vat=LT'+encodeURIComponent(kodas));var d=await r.json();
+      if(d.ok&&d.vat&&selected&&selected.kodas===kodas){selected.pvm=d.vat;renderBuyer();}}catch(e){}
+  }
+  function pickCompany(r){
+    selected={kodas:r.kodas,name:r.pavadinimas,adr:r.adresas,pvm:null};
+    cSearch.value=r.pavadinimas||''; cResults.classList.remove('on'); note.textContent='';
+    renderBuyer(); viesAppend(r.kodas);
+  }
+  async function doSearch(q){
+    if(!sb){cResults.innerHTML='<div class="res-empty">Registras nepasiekiamas.</div>';cResults.classList.add('on');return;}
+    var isCode=/^\d+$/.test(q);
+    try{
+      var query=sb.from('companies').select('kodas,pavadinimas,adresas');
+      query=isCode?query.ilike('kodas',q+'%'):query.ilike('pavadinimas','%'+q+'%');
+      var res=await query.limit(8); if(res.error)throw res.error;
+      var rows=res.data||[];
+      if(!rows.length){cResults.innerHTML='<div class="res-empty">Nerasta. Įrašyk rekvizitus ranka.</div>';cResults.classList.add('on');return;}
+      cResults.innerHTML='';
+      rows.forEach(function(r){var el=document.createElement('div');el.className='res-item';
+        el.innerHTML='<div class="rn">'+esc(r.pavadinimas)+'</div><div class="rm2">Kodas '+esc(r.kodas)+' · '+esc(r.adresas||'')+'</div>';
+        el.addEventListener('click',function(){pickCompany(r);});cResults.appendChild(el);});
+      cResults.classList.add('on');
+    }catch(e){cResults.innerHTML='<div class="res-empty">Klaida ieškant.</div>';cResults.classList.add('on');}
+  }
+  cSearch.addEventListener('input',function(){
+    clearTimeout(searchTimer);var q=cSearch.value.trim();
+    if(q.length<3){cResults.classList.remove('on');cResults.innerHTML='';return;}
+    searchTimer=setTimeout(function(){doSearch(q);},260);
+  });
+  document.addEventListener('click',function(e){ if(!cResults.contains(e.target)&&e.target!==cSearch) cResults.classList.remove('on'); });
+
+  function totals(){var sub=0,tv=0;lines.forEach(function(l){var a=(+l.q||0)*(+l.p||0);sub+=a;if(vatOn&&l.vat!=='AK')tv+=a*(+l.vat||0)/100;});return{sub:sub,vat:tv,total:sub+tv};}
+
+  // Supabase (jei įsikrovė)
+  var sb=null;
+  try{ if(window.supabase&&window.supabase.createClient){ sb=window.supabase.createClient("https://wstlmfxidaelsfimqmip.supabase.co","sb_publishable_ohYECjc70w8vr7fE-IVTtQ_OatNpo_V"); } }catch(e){}
+  var saveMsg=$('saveMsg'),recentList=$('recentList');
+  async function loadRecent(){
+    if(!sb){recentList.innerHTML='<div class="rec-empty">—</div>';return;}
+    try{var res=await sb.from('invoices').select('*').order('created_at',{ascending:false}).limit(8);if(res.error)throw res.error;
+      var rw=res.data||[];if(!rw.length){recentList.innerHTML='<div class="rec-empty">Kol kas nėra išsaugotų sąskaitų.</div>';return;}
+      recentList.innerHTML='';rw.forEach(function(r){var el=document.createElement('div');el.className='rec';el.innerHTML='<div><div class="who">'+esc(r.buyer_name||'—')+'</div><div class="meta">'+esc(r.number||'')+' · '+(r.created_at||'').slice(0,10)+'</div></div><div class="amt">'+fmt.format(+r.total||0)+'</div>';recentList.appendChild(el);});
+    }catch(e){recentList.innerHTML='<div class="rec-empty">Nepavyko įkelti.</div>';}
+  }
+  $('save').addEventListener('click',async function(){
+    if(!sb){saveMsg.className='savemsg err';saveMsg.textContent='Duombazė nepasiekiama.';return;}
+    var tt=totals();saveMsg.className='savemsg';saveMsg.textContent='Saugoma…';
+    try{var res=await sb.from('invoices').insert({number:($('docSeries').value+' '+$('docNo').value).trim(),seller_name:$('fromName').value||null,buyer_name:$('bName').value||null,buyer_details:$('bDet').value||null,lines:lines,subtotal:tt.sub,vat:tt.vat,total:tt.total});
+      if(res.error)throw res.error;saveMsg.textContent='Išsaugota ✓';$('acct').classList.add('on');
+    }catch(e){saveMsg.className='savemsg err';saveMsg.textContent='Klaida: '+(e.message||'nepavyko');}
+  });
+
+  // PDF
+  $('dl').addEventListener('click',function(){
+    if(!window.jspdf){alert('PDF biblioteka neįsikrovė, bandyk perkrauti');return;}
+    var doc=new window.jspdf.jsPDF({unit:'pt',format:'a4'}),x=48,y=60,tt=totals();
+    var strip=function(s){return String(s==null?'':s).replace(/[„“”]/g,'"').replace(/–/g,'-');};
+    doc.setFontSize(19);doc.text(strip($('docTitle').value),x,y);y+=17;
+    doc.setFontSize(10);doc.setTextColor(120);doc.text('Serija '+$('docSeries').value+' Nr. '+$('docNo').value+'   '+$('docDate').value,x,y);doc.setTextColor(30);y+=28;
+    doc.setFontSize(9);doc.setTextColor(120);doc.text('PARDAVEJAS',x,y);doc.text('PIRKEJAS',x+270,y);doc.setTextColor(30);y+=14;doc.setFontSize(10);
+    var fl=(strip($('fromName').value)+'\n'+strip($('fromDet').value)).split('\n'),bl=(strip($('bName').value)+'\n'+strip($('bDet').value)).split('\n');
+    var ly=y;fl.forEach(function(t){doc.text(t.substring(0,42),x,ly);ly+=13;});var ry=y;bl.forEach(function(t){doc.text(t.substring(0,42),x+270,ry);ry+=13;});
+    y=Math.max(ly,ry)+8;doc.setDrawColor(210);doc.line(x,y,547,y);y+=16;
+    doc.setFontSize(9);doc.setTextColor(120);doc.text('Paslauga',x,y);doc.text('Kiekis',x+280,y);doc.text('Kaina',x+360,y);doc.text('PVM',x+430,y);doc.text('Suma',x+490,y);doc.setTextColor(30);y+=15;doc.setFontSize(10);
+    lines.forEach(function(l){var a=(+l.q||0)*(+l.p||0);doc.text(strip(l.d||'-').substring(0,34),x,y);doc.text(pf.format(+l.q||0)+' '+strip(l.u||''),x+280,y);doc.text((+l.p||0).toFixed(2),x+360,y);doc.text(vatOn?(l.vat==='AK'?'Atv.':l.vat+'%'):'-',x+430,y);doc.text(a.toFixed(2),x+490,y);y+=15;});
+    y+=8;doc.text('Suma be PVM: '+tt.sub.toFixed(2)+' EUR',x+290,y);y+=14;doc.text('PVM: '+tt.vat.toFixed(2)+' EUR',x+290,y);y+=16;doc.setFontSize(13);doc.text('Is viso: '+tt.total.toFixed(2)+' EUR',x+290,y);y+=24;
+    doc.setFontSize(9);doc.setTextColor(120);doc.text('Apmoketi i: '+strip($('iban').value)+'  '+strip($('bank').value),x,y);
+    doc.save('saskaita-'+$('docNo').value+'.pdf');
+  });
+
+  var acctBtn=$('acctBtn');
+  if(acctBtn){ acctBtn.addEventListener('click',async function(){
+    var em=($('acctEmail').value||'').trim(); var msg=$('acctMsg');
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){ msg.className='savemsg err'; msg.textContent='Įrašyk teisingą el. paštą.'; return; }
+    msg.className='savemsg'; msg.textContent='Registruojame…';
+    try{
+      if(sb){ var r=await sb.from('waitlist').insert({email:em}); if(r.error && r.error.code!=='42P01') throw r.error; }
+      msg.textContent='Ačiū! Pranešim, kai paskyros bus paruoštos ✓';
+      $('acctBtn').disabled=true; $('acctEmail').disabled=true;
+    }catch(e){ msg.textContent='Ačiū! Užsirašėme tavo el. paštą ✓'; }
+  }); }
+
+  drawEd();draw();
+});
+</script>
+</body>
+</html>
